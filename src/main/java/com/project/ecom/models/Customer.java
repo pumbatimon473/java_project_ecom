@@ -1,8 +1,7 @@
 package com.project.ecom.models;
 
 import com.project.ecom.enums.UserType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,4 +21,12 @@ public class Customer extends User {
     public UserType getUserType() {
         return UserType.CUSTOMER;
     }
+
+    @ManyToMany  // separate mapping table
+    @JoinTable(
+            name = "customer_address",
+            joinColumns = @JoinColumn(name = "customer_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private List<Address> addresses;
 }

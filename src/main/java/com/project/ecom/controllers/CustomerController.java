@@ -37,7 +37,7 @@ public class CustomerController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    @PostMapping("/addAddress")
+    @PostMapping("/address")
     public ResponseEntity<AddAddressResponseDto> addAddress(@RequestBody AddAddressRequestDto requestDto)
             throws UserNotFoundException {
         Address address = this.customerService.addAddress(

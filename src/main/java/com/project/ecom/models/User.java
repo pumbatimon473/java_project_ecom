@@ -10,12 +10,6 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
-/* Removed below annotation, as it was causing build failure.
-@Inheritance(strategy = InheritanceType.JOINED)  // defines how inheritance hierarchy should be mapped to RDBMS (Separate table for each User subtype)
-
-Error:
-org.hibernate.AnnotationException: Mapped superclass 'com.project.ecom.models.User' may not specify an '@Inheritance' mapping strategy
- */
 public abstract class User extends BaseModel {
     private String name;
     private String email;
@@ -23,18 +17,6 @@ public abstract class User extends BaseModel {
 
     @Embedded
     private PhoneNumber phoneNumber;
-
-    /*
-    Decoupled Address from Customer and Seller to resolve OCP (Open-Closed Principle) violation.
-    - For each new User subtype created, the Address class needs to be modified resulting in OCP violation
-     */
-    @ManyToMany
-    @JoinTable(
-            name = "user_address",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "address_id")
-    )
-    private List<Address> addresses;
 
     public abstract UserType getUserType();
 }

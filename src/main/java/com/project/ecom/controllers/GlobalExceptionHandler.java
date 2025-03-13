@@ -2,6 +2,7 @@ package com.project.ecom.controllers;
 
 import com.project.ecom.dtos.ErrorDto;
 import com.project.ecom.errorcodes.GenericErrorCode;
+import com.project.ecom.exceptions.UnauthorizedUserException;
 import com.project.ecom.exceptions.UserAlreadyExistsException;
 import com.project.ecom.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorDto(GenericErrorCode.USER_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedUserException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<ErrorDto> handleUnauthorizedUserException(UnauthorizedUserException e) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorDto(GenericErrorCode.UNAUTHORIZED_USER, e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
