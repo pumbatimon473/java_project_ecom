@@ -10,7 +10,12 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
+/* Removed below annotation, as it was causing build failure.
 @Inheritance(strategy = InheritanceType.JOINED)  // defines how inheritance hierarchy should be mapped to RDBMS (Separate table for each User subtype)
+
+Error:
+org.hibernate.AnnotationException: Mapped superclass 'com.project.ecom.models.User' may not specify an '@Inheritance' mapping strategy
+ */
 public abstract class User extends BaseModel {
     private String name;
     private String email;

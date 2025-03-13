@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@Table(name = "`order`")  // since 'order' is a reserved keyword in my DBs, escaping it with backtick.
 public class Order extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "customer_id")
