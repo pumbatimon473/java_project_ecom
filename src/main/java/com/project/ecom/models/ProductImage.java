@@ -1,5 +1,6 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,6 +12,7 @@ import java.util.List;
 @Entity
 public class ProductImage extends BaseModel {
     @OneToOne(mappedBy = "image")
+    @JsonBackReference  // Manages circular references during JSON serialization - Inverse Relation
     private Product product;
 
     @ElementCollection

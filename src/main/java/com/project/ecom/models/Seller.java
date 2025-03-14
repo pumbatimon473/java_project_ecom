@@ -1,5 +1,6 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.ecom.enums.UserType;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -15,9 +16,11 @@ public class Seller extends User {
     private String gstRegNumber;
 
     @OneToMany(mappedBy = "seller")
+    @JsonIgnore  // ignores serialization of the invoices collection
     private List<Invoice> invoices;
 
     @OneToMany(mappedBy = "seller")
+    @JsonIgnore  // ignores serialization of the products collection
     private List<Product> products;
 
     @Override

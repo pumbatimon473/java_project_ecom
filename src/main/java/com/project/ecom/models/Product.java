@@ -1,5 +1,7 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,15 +24,19 @@ public class Product extends BaseModel {
 
     @OneToOne
     @JoinColumn(name = "image_id")
+    @JsonManagedReference  // Manages circular references during JSON serialization - Forward relation
     private ProductImage image;
 
     @OneToOne(mappedBy = "product")
+    @JsonIgnore
     private ProductInventory inventory;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore  // ignores serialization of the cartItems collection
     private List<CartItem> cartItems;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore  // ignores serialization of the orderItems collection
     private List<OrderItem> orderItems;
 
     @ManyToOne

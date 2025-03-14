@@ -2,6 +2,7 @@ package com.project.ecom.controllers;
 
 import com.project.ecom.dtos.ErrorDto;
 import com.project.ecom.errorcodes.GenericErrorCode;
+import com.project.ecom.exceptions.ProductNotFoundException;
 import com.project.ecom.exceptions.UnauthorizedUserException;
 import com.project.ecom.exceptions.UserAlreadyExistsException;
 import com.project.ecom.exceptions.UserNotFoundException;
@@ -27,6 +28,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorDto(GenericErrorCode.USER_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ErrorDto> handleProductNotFoundException(ProductNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorDto(GenericErrorCode.PRODUCT_NOT_FOUND, e.getMessage()));
     }
 
     @ExceptionHandler(UnauthorizedUserException.class)

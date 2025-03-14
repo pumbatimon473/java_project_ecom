@@ -5,7 +5,8 @@ public enum GenericErrorCode implements ErrorCode {
     INTERNAL_SERVER_ERROR(500),
     USER_NOT_FOUND(404),
     NOT_ACCEPTABLE(406),
-    UNAUTHORIZED_USER(401);
+    UNAUTHORIZED_USER(401),
+    PRODUCT_NOT_FOUND(404);
 
     private Integer errorCode;
 

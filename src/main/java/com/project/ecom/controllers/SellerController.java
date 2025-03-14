@@ -23,19 +23,25 @@ public class SellerController {
     }
 
     /*
-    Encountering error while writing the response:
+    Encountering error while writing the JSON response:
     {
     "errorCode": "INTERNAL_SERVER_ERROR",
     "errorMessage": "Could not write JSON: Document nesting depth (1001) exceeds the maximum allowed (1000, from `StreamWriteConstraints.getMaxNestingDepth()`)"
     }
 
-    Cause:
-    - The associated product category is trying to fetch all the associated products.
-    - Since, each product has associated category, this is resulting in a nested call.
+    Root Cause: Bidirectional relation between Product and ProductCategory
+    - The Product is referencing ProductCategory, which in turn is referencing Product,
+    leading to circular reference creation
+    - The circular reference creation could lead to infinite recursive calls during JSON serialization.
 
-    Observation:
-    - Since a product category can have multiple products, the default fetch type should be LAZY
-    but somehow all the associated products are being fetched.
+    Resolution:
+    - Using @JsonIgnore or @JsonManagedReference and @JsonBackReference to manage circular reference
+    during JSON serialization.
+        - @JsonIgnore: ignores one side of the relation during JSON serialization
+        - @JsonManagedReference and @JsonBackReference:
+            - @JsonManagedReference: used on the owning side of the relation (forward relation - has the foreign key)
+            - @JsonBackReference: used on the non-owning side (inverse side of the relation)
+    - Using custom DTOs to control JSON serialization by having the necessary attributes.
      */
     @PostMapping("/product")
     public ResponseEntity<AddProductResponseDto> addProduct(@RequestBody AddProductRequestDto requestDto) {

@@ -1,5 +1,6 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
@@ -15,5 +16,6 @@ public class ProductCategory extends BaseModel {
     private String description;
 
     @OneToMany(mappedBy = "category")
+    @JsonIgnore  // tells Jackson's serializer to ignore serialization of the products collection
     private List<Product> products;
 }
