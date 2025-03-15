@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
-    private IAdminService adminService;
+    private final IAdminService adminService;
 
     @Autowired
     public AdminController(IAdminService adminService) {

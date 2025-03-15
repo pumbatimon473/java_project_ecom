@@ -1,6 +1,5 @@
 package com.project.ecom.dtos;
 
-import com.project.ecom.models.Product;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class UpdateProductInventoryResponseDto {
     private Long productInventoryId;
-    private Product product;
+    private ProductDto product;
     private Integer quantity;
 }

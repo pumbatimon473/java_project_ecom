@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/customer")
 public class CustomerController {
-    private ICustomerService customerService;
+    private final ICustomerService customerService;
 
     @Autowired
     public CustomerController(ICustomerService customerService) {

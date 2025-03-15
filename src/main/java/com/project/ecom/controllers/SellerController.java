@@ -1,9 +1,7 @@
 package com.project.ecom.controllers;
 
-import com.project.ecom.dtos.AddProductRequestDto;
-import com.project.ecom.dtos.AddProductResponseDto;
-import com.project.ecom.dtos.UpdateProductInventoryRequestDto;
-import com.project.ecom.dtos.UpdateProductInventoryResponseDto;
+import com.project.ecom.controllers.reusables.Reusable;
+import com.project.ecom.dtos.*;
 import com.project.ecom.models.Product;
 import com.project.ecom.models.ProductInventory;
 import com.project.ecom.services.ISellerService;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/seller")
 public class SellerController {
-    private ISellerService sellerService;
+    private final ISellerService sellerService;
 
     @Autowired
     public SellerController(ISellerService sellerService) {
@@ -53,7 +51,9 @@ public class SellerController {
         responseDto.setDescription(product.getDescription());
         responseDto.setPrice(product.getPrice());
         responseDto.setImage(product.getImage());
-        responseDto.setSeller(product.getSeller());
+
+        SellerDto sellerDto = Reusable.mapSellerToSellerDto(product.getSeller());
+        responseDto.setSeller(sellerDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
@@ -62,7 +62,9 @@ public class SellerController {
         ProductInventory productInventory = this.sellerService.updateProductInventory(requestDto.getSellerId(), requestDto.getProductId(), requestDto.getQuantity());
         UpdateProductInventoryResponseDto responseDto = new UpdateProductInventoryResponseDto();
         responseDto.setProductInventoryId(productInventory.getId());
-        responseDto.setProduct(productInventory.getProduct());
+
+        Product product = productInventory.getProduct();
+        responseDto.setProduct(Reusable.mapProductToProductDto(product));
         responseDto.setQuantity(productInventory.getQuantity());
         return ResponseEntity.ok(responseDto);
     }
