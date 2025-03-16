@@ -1,9 +1,6 @@
 package com.project.ecom.controllers.reusables;
 
-import com.project.ecom.dtos.GetProductsResponseDto;
-import com.project.ecom.dtos.ProductDetailsDto;
-import com.project.ecom.dtos.ProductDto;
-import com.project.ecom.dtos.SellerDto;
+import com.project.ecom.dtos.*;
 import com.project.ecom.models.Product;
 import com.project.ecom.models.Seller;
 import org.springframework.data.domain.Page;
@@ -54,6 +51,14 @@ public class Reusable {
 
         SellerDto sellerDto = Reusable.mapSellerToSellerDto(product.getSeller());
         productDto.setSoldBy(sellerDto);
+        return productDto;
+    }
+
+    public static ProductInCartDto mapProductToProductInCartDto(Product product) {
+        ProductInCartDto productDto = new ProductInCartDto();
+        productDto.setProductId(product.getId());
+        productDto.setName(product.getName());
+        productDto.setPrice(product.getPrice());
         return productDto;
     }
 }

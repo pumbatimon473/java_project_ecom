@@ -2,10 +2,7 @@ package com.project.ecom.controllers;
 
 import com.project.ecom.dtos.ErrorDto;
 import com.project.ecom.errorcodes.GenericErrorCode;
-import com.project.ecom.exceptions.ProductNotFoundException;
-import com.project.ecom.exceptions.UnauthorizedUserException;
-import com.project.ecom.exceptions.UserAlreadyExistsException;
-import com.project.ecom.exceptions.UserNotFoundException;
+import com.project.ecom.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<ErrorDto> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
@@ -23,7 +19,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorDto> handleUserNotFoundException(UserNotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -31,15 +26,34 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorDto> handleProductNotFoundException(ProductNotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorDto(GenericErrorCode.PRODUCT_NOT_FOUND, e.getMessage()));
     }
 
+    @ExceptionHandler(CartItemNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleCartItemNotFoundException(CartItemNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorDto(GenericErrorCode.CART_ITEM_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(NoActiveCartLinkedException.class)
+    public ResponseEntity<ErrorDto> handleNoActiveCartLinkedException(NoActiveCartLinkedException e) {
+        return ResponseEntity
+                .status(HttpStatus.EXPECTATION_FAILED)
+                .body(new ErrorDto(GenericErrorCode.NO_ACTIVE_CART_LINKED, e.getMessage()));
+    }
+
+    @ExceptionHandler(NoActiveCartException.class)
+    public ResponseEntity<ErrorDto> handleNoActiveCartException(NoActiveCartException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorDto(GenericErrorCode.NO_ACTIVE_CART, e.getMessage()));
+    }
+
     @ExceptionHandler(UnauthorizedUserException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<ErrorDto> handleUnauthorizedUserException(UnauthorizedUserException e) {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
@@ -47,7 +61,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorDto> handleGeneralException(Exception e) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -55,7 +68,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_ACCEPTABLE)

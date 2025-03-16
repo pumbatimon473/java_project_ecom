@@ -6,9 +6,12 @@ public enum GenericErrorCode implements ErrorCode {
     USER_NOT_FOUND(404),
     NOT_ACCEPTABLE(406),
     UNAUTHORIZED_USER(401),
-    PRODUCT_NOT_FOUND(404);
+    PRODUCT_NOT_FOUND(404),
+    CART_ITEM_NOT_FOUND(404),
+    NO_ACTIVE_CART_LINKED(417),
+    NO_ACTIVE_CART(404);
 
-    private Integer errorCode;
+    private final Integer errorCode;
 
     GenericErrorCode(Integer errorCode) {
         this.errorCode = errorCode;
