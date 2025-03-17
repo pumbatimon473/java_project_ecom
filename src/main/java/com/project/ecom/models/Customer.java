@@ -2,16 +2,15 @@ package com.project.ecom.models;
 
 import com.project.ecom.enums.UserType;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @Entity
 public class Customer extends User {
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<CustomerSession> sessions;
 
     @OneToMany(mappedBy = "customer")

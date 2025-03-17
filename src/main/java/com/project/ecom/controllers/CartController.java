@@ -2,14 +2,14 @@ package com.project.ecom.controllers;
 
 import com.project.ecom.controllers.reusables.Reusable;
 import com.project.ecom.dtos.*;
-import com.project.ecom.models.Cart;
-import com.project.ecom.models.CartItem;
-import com.project.ecom.models.CustomerSession;
-import com.project.ecom.models.Product;
+import com.project.ecom.models.*;
 import com.project.ecom.services.ICartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -76,5 +76,21 @@ public class CartController {
         CartStatusDto cartStatusDto = new CartStatusDto(cart.getId(), cart.getStatus());
         responseDto.setCart(cartStatusDto);
         return ResponseEntity.ok(responseDto);
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<OrderDetailsDto> checkoutCart(@RequestBody CheckoutCartRequestDto requestDto) {
+        Order order = this.cartService.checkoutCart(requestDto.getCustomerId(), requestDto.getDeliveryAddressId());
+        OrderDetailsDto orderDetailsDto = new OrderDetailsDto();
+        orderDetailsDto.setOrderId(order.getId());
+        orderDetailsDto.setStatus(order.getStatus());
+        orderDetailsDto.setCustomerId(order.getCustomer().getId());
+        orderDetailsDto.setDeliveryAddress(order.getDeliveryAddress());
+        orderDetailsDto.setOrderTotal(order.getOrderTotal());
+
+        List<OrderItemDto> orderItems = order.getOrderItems().stream().map(Reusable::mapOrderItemToOrderItemDto).toList();
+        orderDetailsDto.setOrderItems(orderItems);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderDetailsDto);
     }
 }

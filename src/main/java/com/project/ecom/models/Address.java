@@ -1,5 +1,6 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.project.ecom.enums.Country;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class Address extends BaseModel {
     private String state;  // mapping will be handled in the app logic
 
     @OneToMany(mappedBy = "deliveryAddress")
+    @JsonBackReference
     private List<Order> orders;
 
     @Enumerated(EnumType.STRING)

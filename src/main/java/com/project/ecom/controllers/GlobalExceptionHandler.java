@@ -53,6 +53,20 @@ public class GlobalExceptionHandler {
                 .body(new ErrorDto(GenericErrorCode.NO_ACTIVE_CART, e.getMessage()));
     }
 
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleAddressNotFoundException(AddressNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorDto(GenericErrorCode.ADDRESS_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(AddressNotLinkedException.class)
+    public ResponseEntity<ErrorDto> handleAddressNotLinkedException(AddressNotLinkedException e) {
+        return ResponseEntity
+                .status(HttpStatus.EXPECTATION_FAILED)
+                .body(new ErrorDto(GenericErrorCode.ADDRESS_NOT_LINKED, e.getMessage()));
+    }
+
     @ExceptionHandler(UnauthorizedUserException.class)
     public ResponseEntity<ErrorDto> handleUnauthorizedUserException(UnauthorizedUserException e) {
         return ResponseEntity
@@ -69,6 +83,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_ACCEPTABLE)
+                .body(new ErrorDto(GenericErrorCode.NOT_ACCEPTABLE, e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorDto> handleIllegalStateException(IllegalStateException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_ACCEPTABLE)
                 .body(new ErrorDto(GenericErrorCode.NOT_ACCEPTABLE, e.getMessage()));

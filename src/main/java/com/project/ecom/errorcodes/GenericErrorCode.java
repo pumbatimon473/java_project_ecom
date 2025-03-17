@@ -9,7 +9,9 @@ public enum GenericErrorCode implements ErrorCode {
     PRODUCT_NOT_FOUND(404),
     CART_ITEM_NOT_FOUND(404),
     NO_ACTIVE_CART_LINKED(417),
-    NO_ACTIVE_CART(404);
+    NO_ACTIVE_CART(404),
+    ADDRESS_NOT_FOUND(404),
+    ADDRESS_NOT_LINKED(417);
 
     private final Integer errorCode;
 

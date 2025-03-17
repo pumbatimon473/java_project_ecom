@@ -2,6 +2,7 @@ package com.project.ecom.services;
 
 import com.project.ecom.models.Cart;
 import com.project.ecom.models.CartItem;
+import com.project.ecom.models.Order;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ public interface ICartService {
     CartItem updateCartItem(Long customerId, Long cartItemId, Integer incrementVal);
 
     Cart getCart(Long customerId);  // returns ACTIVE cart
+
+    Order checkoutCart(Long customerId, Long deliveryAddressId);
 }

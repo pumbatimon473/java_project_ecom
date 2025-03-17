@@ -1,14 +1,14 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.project.ecom.enums.UserSessionStatus;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @Entity
 public class CustomerSession extends BaseModel {
     @ManyToOne
@@ -19,6 +19,7 @@ public class CustomerSession extends BaseModel {
     private UserSessionStatus status;
 
     @OneToMany(mappedBy = "session")
+    @JsonBackReference
     private List<Cart> carts;  // A customer session can have many carts but only one of them will be active
 
     public Boolean isActive() {

@@ -19,15 +19,19 @@ public class CartService implements ICartService {
     private final ICustomerSessionRepository customerSessionRepo;
     private final ICartRepository cartRepo;
     private final ICartItemRepository cartItemRepo;
+    private final IAddressRepository addressRepo;
+    private final IOrderService orderService;
 
     @Autowired
-    public CartService(ICustomerRepository customerRepo, IProductRepository productRepo, IProductInventoryRepository productInventoryRepo, ICustomerSessionRepository customerSessionRepo, ICartRepository cartRepo, ICartItemRepository cartItemRepo) {
+    public CartService(ICustomerRepository customerRepo, IProductRepository productRepo, IProductInventoryRepository productInventoryRepo, ICustomerSessionRepository customerSessionRepo, ICartRepository cartRepo, ICartItemRepository cartItemRepo, IAddressRepository addressRepo, IOrderService orderService) {
         this.customerRepo = customerRepo;
         this.productRepo = productRepo;
         this.productInventoryRepo = productInventoryRepo;
         this.customerSessionRepo = customerSessionRepo;
         this.cartRepo = cartRepo;
         this.cartItemRepo = cartItemRepo;
+        this.addressRepo = addressRepo;
+        this.orderService = orderService;
     }
 
     @Override
@@ -140,5 +144,24 @@ public class CartService implements ICartService {
                 .orElseThrow(() -> new NoActiveUserSessionException(customerId));
         return this.cartRepo.findBySessionIdAndStatus(customerSession.getId(), CartStatus.ACTIVE)
                 .orElseThrow(() -> new NoActiveCartException(customerId));
+    }
+
+    @Override
+    public Order checkoutCart(Long customerId, Long deliveryAddressId) {
+        Cart cart = this.getCart(customerId);
+        this.addressRepo.findById(deliveryAddressId)
+                .orElseThrow(() -> new AddressNotFoundException(deliveryAddressId));
+        Long isDeliveryAddressLinked = this.customerRepo.isAddressAssociatedWithCustomer(deliveryAddressId, customerId);
+        if (isDeliveryAddressLinked != 1)
+            throw new AddressNotLinkedException(deliveryAddressId, customerId);
+        // forward the request to the OrderService
+        List<Long> cartItemIds = cart.getCartItems().stream().map(BaseModel::getId).toList();
+        Order order = this.orderService.createOrder(customerId, cartItemIds, deliveryAddressId);
+        // mark the cart as CHECKED_OUT and terminate the customer session
+        cart.setStatus(CartStatus.CHECKED_OUT);
+        cart.getSession().setStatus(UserSessionStatus.ENDED);
+        this.customerSessionRepo.save(cart.getSession());
+        this.cartRepo.save(cart);
+        return order;
     }
 }
