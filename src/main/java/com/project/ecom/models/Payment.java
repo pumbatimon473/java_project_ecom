@@ -24,4 +24,6 @@ public class Payment extends BaseModel {
 
     @OneToMany(mappedBy = "payment")
     private List<Invoice> invoices;
+
+    private String sessionId;  // represents the checkout session id or the payment link id
 }

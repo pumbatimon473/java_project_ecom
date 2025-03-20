@@ -1,9 +1,7 @@
 package com.project.ecom.controllers.reusables;
 
 import com.project.ecom.dtos.*;
-import com.project.ecom.models.OrderItem;
-import com.project.ecom.models.Product;
-import com.project.ecom.models.Seller;
+import com.project.ecom.models.*;
 import org.springframework.data.domain.Page;
 
 /*
@@ -68,5 +66,14 @@ public class Reusable {
         orderItemDto.setProduct(Reusable.mapProductToProductInCartDto(orderItem.getProduct()));
         orderItemDto.setQuantity(orderItem.getQuantity());
         return orderItemDto;
+    }
+
+    public static PaymentDto mapPaymentToPaymentDto(Payment payment) {
+        PaymentDto paymentDto = new PaymentDto();
+        paymentDto.setOrderIds(payment.getOrders().stream().map(BaseModel::getId).toList());
+        paymentDto.setAmount(payment.getAmount());
+        paymentDto.setStatus(payment.getStatus());
+        paymentDto.setTransactionId(payment.getTransactionId());
+        return paymentDto;
     }
 }

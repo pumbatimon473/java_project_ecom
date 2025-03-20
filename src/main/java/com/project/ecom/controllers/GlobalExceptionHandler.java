@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,6 +29,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorDto(GenericErrorCode.PRODUCT_NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(NoActiveUserSessionException.class)
+    public ResponseEntity<ErrorDto> handleNoActiveUserSessionException(NoActiveUserSessionException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorDto(GenericErrorCode.NO_ACTIVE_USER_SESSION, e.getMessage()));
     }
 
     @ExceptionHandler(CartItemNotFoundException.class)
@@ -72,6 +78,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorDto(GenericErrorCode.UNAUTHORIZED_USER, e.getMessage()));
+    }
+
+    @ExceptionHandler(PaymentLinkCreationException.class)
+    public ResponseEntity<ErrorDto> handlePaymentLinkCreationException(PaymentLinkCreationException e) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorDto(GenericErrorCode.INTERNAL_SERVER_ERROR, e.getMessage()));
+    }
+
+    @ExceptionHandler(PaymentTransactionRetrievalException.class)
+    public ResponseEntity<ErrorDto> handlePaymentTransactionRetrievalException(PaymentTransactionRetrievalException e) {
+        return ResponseEntity
+                .status(HttpStatus.FAILED_DEPENDENCY)
+                .body(new ErrorDto(GenericErrorCode.PAYMENT_GATEWAY_ERROR, e.getMessage()));
+    }
+
+    @ExceptionHandler(OrderConfirmationException.class)
+    public ResponseEntity<ErrorDto> handleOrderConfirmationException(OrderConfirmationException e) {
+        return ResponseEntity
+                .status(HttpStatus.PRECONDITION_FAILED)
+                .body(new ErrorDto(GenericErrorCode.INSUFFICIENT_PRODUCT_INVENTORY, e.getMessage()));
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleOrderNotFoundException(OrderNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorDto(GenericErrorCode.ORDER_NOT_FOUND, e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

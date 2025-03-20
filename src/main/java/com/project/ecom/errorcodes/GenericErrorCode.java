@@ -11,7 +11,11 @@ public enum GenericErrorCode implements ErrorCode {
     NO_ACTIVE_CART_LINKED(417),
     NO_ACTIVE_CART(404),
     ADDRESS_NOT_FOUND(404),
-    ADDRESS_NOT_LINKED(417);
+    ADDRESS_NOT_LINKED(417),
+    ORDER_NOT_FOUND(404),
+    NO_ACTIVE_USER_SESSION(404),
+    INSUFFICIENT_PRODUCT_INVENTORY(911),
+    PAYMENT_GATEWAY_ERROR(424);
 
     private final Integer errorCode;
 
