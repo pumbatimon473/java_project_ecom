@@ -18,26 +18,20 @@ import java.util.Optional;
 public class SellerService implements ISellerService {
     private IProductRepository productRepo;
     private IProductInventoryRepository productInventoryRepo;
-    private ISellerRepository sellerRepo;
     private IProductCategoryRepository productCategoryRepo;
     private IProductImageRepository productImageRepo;
 
     @Autowired
-    public SellerService(IProductRepository productRepo, IProductInventoryRepository productInventoryRepo, ISellerRepository sellerRepo,
+    public SellerService(IProductRepository productRepo, IProductInventoryRepository productInventoryRepo,
                          IProductCategoryRepository productCategoryRepo, IProductImageRepository productImageRepo) {
         this.productRepo = productRepo;
         this.productInventoryRepo = productInventoryRepo;
-        this.sellerRepo = sellerRepo;
         this.productCategoryRepo = productCategoryRepo;
         this.productImageRepo = productImageRepo;
     }
 
     @Override
     public Product addProduct(Long sellerId, String name, Long categoryId, String description, BigDecimal price, List<String> imageUrls) throws UserNotFoundException, UnauthorizedUserException {
-        Seller seller = this.sellerRepo.findById(sellerId)
-                .orElseThrow(() -> new UserNotFoundException(sellerId));
-        if (seller.getUserType() != UserType.SELLER)
-            throw new UnauthorizedUserException(sellerId);
         // check if the given product category is valid
         ProductCategory productCategory = this.productCategoryRepo.findById(categoryId)
                 .orElseThrow(() -> new ProductCategoryNotFoundException(categoryId));
@@ -47,7 +41,7 @@ public class SellerService implements ISellerService {
         product.setCategory(productCategory);
         product.setDescription(description);
         product.setPrice(price);
-        product.setSeller(seller);
+        product.setSellerId(sellerId);
         this.productRepo.save(product);
         // save product image if any
         if (!imageUrls.isEmpty()) {
@@ -63,14 +57,10 @@ public class SellerService implements ISellerService {
 
     @Override
     public ProductInventory updateProductInventory(Long sellerId, Long productId, Integer quantity) throws UserNotFoundException, UnauthorizedUserException, ProductNotFoundException {
-        Seller seller = this.sellerRepo.findById(sellerId)
-                .orElseThrow(() -> new UserNotFoundException(sellerId));
-        if (seller.getUserType() != UserType.SELLER)
-            throw new UnauthorizedUserException(sellerId);
         Product product = this.productRepo.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
         // ensure the product is listed by the given seller
-        if (!product.getSeller().getId().equals(sellerId))
+        if (!product.getSellerId().equals(sellerId))
             throw new UnauthorizedUserException(sellerId);
         // create or update product inventory
         Optional<ProductInventory> productInventoryOptional = this.productInventoryRepo.findByProductId(productId);

@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DeleteCartItemRequestDto {
-    private Long customerId;
+    // private Long customerId;
     private Long cartItemId;
 }

@@ -11,9 +11,11 @@ import java.util.List;
 @Setter
 @Entity
 public class CustomerSession extends BaseModel {
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+//    @ManyToOne
+//    @JoinColumn(name = "customer_id")
+//    private Customer customer;
+
+    private Long customerId;
 
     @Enumerated(EnumType.STRING)
     private UserSessionStatus status;

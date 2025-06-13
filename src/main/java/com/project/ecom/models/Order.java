@@ -15,9 +15,11 @@ import java.util.List;
 @Entity
 @Table(name = "`order`")  // since 'order' is a reserved keyword in my DBs, escaping it with backtick.
 public class Order extends BaseModel {
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+//    @ManyToOne
+//    @JoinColumn(name = "customer_id")
+//    private Customer customer;
+
+    private Long customerId;
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems;

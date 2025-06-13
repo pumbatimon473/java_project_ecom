@@ -17,6 +17,13 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/* Reference Doc:
+Payment Links APIs
+https://razorpay.com/docs/api/payments/payment-links
+
+Test Card Details
+https://razorpay.com/docs/payments/payments/test-card-details/
+ */
 @Component("razorpayPaymentGateway")
 public class RazorpayPaymentGatewayAdaptor implements IPaymentGatewayAdapter {
     private final RazorpayConfigurationProperties config;

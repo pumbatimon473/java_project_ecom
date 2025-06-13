@@ -10,6 +10,8 @@ import com.project.ecom.services.IAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +28,9 @@ public class AdminController {
     }
 
     @PostMapping("/product_category")
-    ResponseEntity<CreateProductCategoryResponseDto> createProductCategory(@RequestBody CreateProductCategoryRequestDto requestDto) {
-        ProductCategory productCategory = this.adminService.addProductCategory(requestDto.getAdminId(), requestDto.getProductCategoryName(), requestDto.getDescription());
+    ResponseEntity<CreateProductCategoryResponseDto> createProductCategory(@RequestBody CreateProductCategoryRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+        Long adminId = jwt.getClaim("user_id");
+        ProductCategory productCategory = this.adminService.addProductCategory(adminId, requestDto.getProductCategoryName(), requestDto.getDescription());
         CreateProductCategoryResponseDto responseDto = new CreateProductCategoryResponseDto();
         responseDto.setId(productCategory.getId());
         responseDto.setProductCategoryName(productCategory.getName());
@@ -35,19 +38,4 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @PostMapping("/seller")
-    ResponseEntity<RegisterSellerResponseDto> createSeller(@RequestBody RegisterSellerRequestDto requestDto) {
-        Seller seller = this.adminService.registerSeller(
-                requestDto.getAdminId(), requestDto.getName(), requestDto.getEmail(), requestDto.getPassword(), requestDto.getPhoneNumber(),
-                requestDto.getPanNumber(), requestDto.getGstRegNumber()
-        );
-        RegisterSellerResponseDto responseDto = new RegisterSellerResponseDto();
-        responseDto.setSellerId(seller.getId());
-        responseDto.setName(seller.getName());
-        responseDto.setEmail(seller.getEmail());
-        responseDto.setPhoneNumber(seller.getPhoneNumber());
-        responseDto.setPanNumber(seller.getPanNumber());
-        responseDto.setGstRegNumber(seller.getGstRegNumber());
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    }
 }

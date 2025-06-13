@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class AddProductRequestDto {
-    private Long sellerId;
+    // private Long sellerId;
     private String name;
     private Long productCategoryId;
     private String description;

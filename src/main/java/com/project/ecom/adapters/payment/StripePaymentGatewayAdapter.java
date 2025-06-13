@@ -25,6 +25,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/* Reference Doc:
+Use the API to create and manage payment links
+https://docs.stripe.com/payment-links/api#post-payment-invoices
+
+Testing: Simulate payments to test your integration
+https://docs.stripe.com/testing
+ */
+
 @Component("stripePaymentGateway")
 public class StripePaymentGatewayAdapter implements IPaymentGatewayAdapter {
     private final StripeConfigurationProperties config;

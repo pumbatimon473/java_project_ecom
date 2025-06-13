@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderService implements IOrderService {
-    private final ICustomerRepository customerRepo;
     private final ICartItemRepository cartItemRepo;
     private final IAddressRepository addressRepo;
     private final IProductInventoryRepository productInventoryRepo;
@@ -23,8 +22,7 @@ public class OrderService implements IOrderService {
     private final IOrderItemRepository orderItemRepo;
 
     @Autowired
-    public OrderService(ICustomerRepository customerRepo, ICartItemRepository cartItemRepo, IAddressRepository addressRepo, IProductInventoryRepository productInventoryRepo, IOrderRepository orderRepo, IOrderItemRepository orderItemRepo) {
-        this.customerRepo = customerRepo;
+    public OrderService(ICartItemRepository cartItemRepo, IAddressRepository addressRepo, IProductInventoryRepository productInventoryRepo, IOrderRepository orderRepo, IOrderItemRepository orderItemRepo) {
         this.cartItemRepo = cartItemRepo;
         this.addressRepo = addressRepo;
         this.productInventoryRepo = productInventoryRepo;
@@ -34,8 +32,6 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order createOrder(Long customerId, List<Long> cartItemIds, Long deliveryAddressId) {
-        Customer customer = this.customerRepo.findById(customerId)
-                .orElseThrow(() -> new UserNotFoundException(customerId));
         Address deliveryAddress = this.addressRepo.findById(deliveryAddressId)
                 .orElseThrow(() -> new AddressNotFoundException(deliveryAddressId));
         // validate cart items
@@ -46,7 +42,7 @@ public class OrderService implements IOrderService {
                     .orElseThrow(() -> new CartItemNotFoundException(cartItemId));
             if (cartItem.getCart().getStatus() != CartStatus.ACTIVE)
                 throw new NoActiveCartLinkedException(cartItemId);
-            if (!cartItem.getCart().getSession().getCustomer().getId().equals(customerId))
+            if (!cartItem.getCart().getSession().getCustomerId().equals(customerId))
                 throw new IllegalStateException(String.format("Cart item with id %d is not linked to the customer with id %d", cartItemId, customerId));
             // check product inventory
             ProductInventory productInventory = this.productInventoryRepo.findByProductId(cartItem.getProduct().getId())
@@ -62,7 +58,7 @@ public class OrderService implements IOrderService {
         orderTotal.setAmount(orderAmount);
         // create order:
         Order order = new Order();
-        order.setCustomer(customer);
+        order.setCustomerId(customerId);
         order.setDeliveryAddress(deliveryAddress);
         order.setOrderTotal(orderTotal);
         order.setStatus(OrderStatus.PENDING);

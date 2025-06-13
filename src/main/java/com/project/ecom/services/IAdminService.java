@@ -9,12 +9,6 @@ import com.project.ecom.models.Seller;
 import com.project.ecom.models.User;
 
 public interface IAdminService {
-    User registerAdmin(Long adminId, String name, String email, String password)
-            throws UserNotFoundException, UnauthorizedUserException, UserAlreadyExistsException;
+    ProductCategory addProductCategory(Long adminId, String name, String description);
 
-    ProductCategory addProductCategory(Long adminId, String name, String description)
-            throws UserNotFoundException, UnauthorizedUserException;
-
-    Seller registerSeller(Long adminId, String name, String email, String password, PhoneNumber phoneNumber, String panNumber, String gstRegNumber)
-            throws UserNotFoundException, UnauthorizedUserException, UserAlreadyExistsException;
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RegisterSellerRequestDto {
-    private Long adminId;
+    // private Long adminId;
     private String name;
     private String email;
     private String password;

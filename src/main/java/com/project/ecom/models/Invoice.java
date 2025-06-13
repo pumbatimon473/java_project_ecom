@@ -21,7 +21,9 @@ public class Invoice extends BaseModel {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private Seller seller;
+//    @ManyToOne
+//    @JoinColumn(name = "seller_id")
+//    private Seller seller;
+
+    private Long sellerId;
 }

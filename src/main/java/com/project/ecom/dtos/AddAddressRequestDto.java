@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AddAddressRequestDto {
-    private Long customerId;
+    // private Long customerId;
     private String addressLine1;
     private String addressLine2;
     private String landmark;

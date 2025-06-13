@@ -1,7 +1,9 @@
 package com.project.ecom.dtos;
 
+import com.project.ecom.controllers.reusables.Reusable;
 import com.project.ecom.enums.OrderStatus;
 import com.project.ecom.models.Address;
+import com.project.ecom.models.Order;
 import com.project.ecom.models.OrderTotal;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,4 +19,17 @@ public class OrderDetailsDto {
     private Address deliveryAddress;
     private OrderTotal orderTotal;
     private List<OrderItemDto> orderItems;
+
+    public static OrderDetailsDto from(Order order) {
+        OrderDetailsDto orderDetailsDto = new OrderDetailsDto();
+        orderDetailsDto.setOrderId(order.getId());
+        orderDetailsDto.setStatus(order.getStatus());
+        orderDetailsDto.setCustomerId(order.getCustomerId());
+        orderDetailsDto.setDeliveryAddress(order.getDeliveryAddress());
+        orderDetailsDto.setOrderTotal(order.getOrderTotal());
+
+        List<OrderItemDto> orderItems = order.getOrderItems().stream().map(Reusable::mapOrderItemToOrderItemDto).toList();
+        orderDetailsDto.setOrderItems(orderItems);
+        return orderDetailsDto;
+    }
 }

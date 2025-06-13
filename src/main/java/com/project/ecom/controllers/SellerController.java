@@ -8,6 +8,8 @@ import com.project.ecom.services.ISellerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,8 +44,9 @@ public class SellerController {
     - Using custom DTOs to control JSON serialization by having the necessary attributes.
      */
     @PostMapping("/product")
-    public ResponseEntity<AddProductResponseDto> addProduct(@RequestBody AddProductRequestDto requestDto) {
-        Product product = this.sellerService.addProduct(requestDto.getSellerId(), requestDto.getName(), requestDto.getProductCategoryId(), requestDto.getDescription(), requestDto.getPrice(), requestDto.getImageUrls());
+    public ResponseEntity<AddProductResponseDto> addProduct(@RequestBody AddProductRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+        Long sellerId = jwt.getClaim("user_id");
+        Product product = this.sellerService.addProduct(sellerId, requestDto.getName(), requestDto.getProductCategoryId(), requestDto.getDescription(), requestDto.getPrice(), requestDto.getImageUrls());
         AddProductResponseDto responseDto = new AddProductResponseDto();
         responseDto.setProductId(product.getId());
         responseDto.setName(product.getName());
@@ -52,14 +55,15 @@ public class SellerController {
         responseDto.setPrice(product.getPrice());
         responseDto.setImage(product.getImage());
 
-        SellerDto sellerDto = Reusable.mapSellerToSellerDto(product.getSeller());
-        responseDto.setSeller(sellerDto);
+//        SellerDto sellerDto = Reusable.mapSellerToSellerDto(product.getSeller());
+//        responseDto.setSeller(sellerDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @PostMapping("/product_inventory")
-    public ResponseEntity<UpdateProductInventoryResponseDto> createOrUpdateProductInventory(@RequestBody UpdateProductInventoryRequestDto requestDto) {
-        ProductInventory productInventory = this.sellerService.updateProductInventory(requestDto.getSellerId(), requestDto.getProductId(), requestDto.getQuantity());
+    public ResponseEntity<UpdateProductInventoryResponseDto> createOrUpdateProductInventory(@RequestBody UpdateProductInventoryRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+        Long sellerId = jwt.getClaim("user_id");
+        ProductInventory productInventory = this.sellerService.updateProductInventory(sellerId, requestDto.getProductId(), requestDto.getQuantity());
         UpdateProductInventoryResponseDto responseDto = new UpdateProductInventoryResponseDto();
         responseDto.setProductInventoryId(productInventory.getId());
 

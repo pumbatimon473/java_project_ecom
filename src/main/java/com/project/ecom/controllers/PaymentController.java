@@ -8,6 +8,8 @@ import com.project.ecom.services.IPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,8 +23,9 @@ public class PaymentController {
     }
 
     @PostMapping("/payment_link")
-    public ResponseEntity<String> createPaymentLink(@RequestBody CreatePaymentLinkRequestDto requestDto) {
-        String paymentLink = this.paymentService.getPaymentLink(requestDto.getCustomerId(), requestDto.getOrderId());
+    public ResponseEntity<String> createPaymentLink(@RequestBody CreatePaymentLinkRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+        Long customerId = jwt.getClaim("user_id");
+        String paymentLink = this.paymentService.getPaymentLink(customerId, requestDto.getOrderId());
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentLink);
     }
 

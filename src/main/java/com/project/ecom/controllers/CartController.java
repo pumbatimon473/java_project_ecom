@@ -7,6 +7,8 @@ import com.project.ecom.services.ICartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +24,9 @@ public class CartController {
     }
 
     @PostMapping
-    public ResponseEntity<AddProductToCartResDto> addProductToCart(@RequestBody AddProductToCartReqDto requestDto) {
-        CartItem cartItem = this.cartService.addProductToCart(requestDto.getCustomerId(), requestDto.getProductId(), requestDto.getQuantity());
+    public ResponseEntity<AddProductToCartResDto> addProductToCart(@RequestBody AddProductToCartReqDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+        Long customerId = jwt.getClaim("user_id");
+        CartItem cartItem = this.cartService.addProductToCart(customerId, requestDto.getProductId(), requestDto.getQuantity());
         AddProductToCartResDto responseDto = new AddProductToCartResDto();
         responseDto.setCartItemId(cartItem.getId());
         responseDto.setCartId(cartItem.getCart().getId());
@@ -35,8 +38,9 @@ public class CartController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/{customerId}")
-    public ResponseEntity<CartDto> getCart(@PathVariable(name = "customerId") Long customerId) {
+    @GetMapping
+    public ResponseEntity<CartDto> getCart(@AuthenticationPrincipal Jwt jwt) {
+        Long customerId = jwt.getClaim("user_id");
         Cart cart = this.cartService.getCart(customerId);
         CartDto cartDto = new CartDto();
         cartDto.setCartId(cart.getId());
@@ -44,7 +48,7 @@ public class CartController {
         CustomerSession session = cart.getSession();
         CustomerSessionDto sessionDto = new CustomerSessionDto();
         sessionDto.setSessionId(session.getId());
-        sessionDto.setCustomerId(session.getCustomer().getId());
+        sessionDto.setCustomerId(session.getCustomerId());
         sessionDto.setStatus(session.getStatus());
         cartDto.setSession(sessionDto);
 
@@ -60,37 +64,23 @@ public class CartController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteCartItem(@RequestBody DeleteCartItemRequestDto requestDto) {
-        this.cartService.removeCartItem(requestDto.getCustomerId(), requestDto.getCartItemId());
+    public ResponseEntity<Void> deleteCartItem(@RequestBody DeleteCartItemRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+        Long customerId = jwt.getClaim("user_id");
+        this.cartService.removeCartItem(customerId, requestDto.getCartItemId());
         return ResponseEntity.ok().build();
     }
 
     @PutMapping
-    public ResponseEntity<UpdateCartItemResponseDto> updateCartItem(@RequestBody UpdateCartItemRequestDto requestDto) {
-        CartItem cartItem = this.cartService.updateCartItem(requestDto.getCustomerId(), requestDto.getCartItemId(), requestDto.getIncrementVal());
-        UpdateCartItemResponseDto responseDto = new UpdateCartItemResponseDto();
-        responseDto.setCartItemId(cartItem.getId());
-        responseDto.setProductInCartDto(Reusable.mapProductToProductInCartDto(cartItem.getProduct()));
-        responseDto.setQuantity(cartItem.getQuantity());
-        Cart cart = cartItem.getCart();
-        CartStatusDto cartStatusDto = new CartStatusDto(cart.getId(), cart.getStatus());
-        responseDto.setCart(cartStatusDto);
-        return ResponseEntity.ok(responseDto);
+    public ResponseEntity<UpdateCartItemResponseDto> updateCartItem(@RequestBody UpdateCartItemRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+        Long customerId = jwt.getClaim("user_id");
+        CartItem cartItem = this.cartService.updateCartItem(customerId, requestDto.getCartItemId(), requestDto.getIncrementVal());
+        return ResponseEntity.ok(UpdateCartItemResponseDto.from(cartItem));
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<OrderDetailsDto> checkoutCart(@RequestBody CheckoutCartRequestDto requestDto) {
-        Order order = this.cartService.checkoutCart(requestDto.getCustomerId(), requestDto.getDeliveryAddressId());
-        OrderDetailsDto orderDetailsDto = new OrderDetailsDto();
-        orderDetailsDto.setOrderId(order.getId());
-        orderDetailsDto.setStatus(order.getStatus());
-        orderDetailsDto.setCustomerId(order.getCustomer().getId());
-        orderDetailsDto.setDeliveryAddress(order.getDeliveryAddress());
-        orderDetailsDto.setOrderTotal(order.getOrderTotal());
-
-        List<OrderItemDto> orderItems = order.getOrderItems().stream().map(Reusable::mapOrderItemToOrderItemDto).toList();
-        orderDetailsDto.setOrderItems(orderItems);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderDetailsDto);
+    public ResponseEntity<OrderDetailsDto> checkoutCart(@RequestBody CheckoutCartRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+        Long customerId = jwt.getClaim("user_id");
+        Order order = this.cartService.checkoutCart(customerId, requestDto.getDeliveryAddressId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(OrderDetailsDto.from(order));
     }
 }

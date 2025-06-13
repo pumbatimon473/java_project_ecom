@@ -6,9 +6,6 @@ import com.project.ecom.models.Address;
 import com.project.ecom.models.User;
 
 public interface ICustomerService {
-    User registerCustomer(String name, String email, String password)
-            throws UserAlreadyExistsException;
-
-    Address addAddress(Long customerId, String addressLine1, String addressLine2, String landmark, String pinCode, String city, String state, String country)
+    Address addAddress(Long userId, String addressLine1, String addressLine2, String landmark, String pinCode, String city, String state, String country)
             throws UserNotFoundException;
 }

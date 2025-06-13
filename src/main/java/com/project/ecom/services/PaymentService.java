@@ -5,7 +5,6 @@ import com.project.ecom.enums.OrderStatus;
 import com.project.ecom.enums.PaymentStatus;
 import com.project.ecom.exceptions.*;
 import com.project.ecom.models.*;
-import com.project.ecom.repositories.ICustomerRepository;
 import com.project.ecom.repositories.IOrderRepository;
 import com.project.ecom.repositories.IPaymentRepository;
 import com.project.ecom.repositories.IProductInventoryRepository;
@@ -20,15 +19,13 @@ import java.util.Optional;
 
 @Service
 public class PaymentService implements IPaymentService {
-    private final ICustomerRepository customerRepo;
     private final IOrderRepository orderRepo;
     private final IPaymentGatewayAdapter paymentGatewayAdapter;
     private final IPaymentRepository paymentRepo;
     private final IProductInventoryRepository productInventoryRepo;
 
     @Autowired
-    public PaymentService(ICustomerRepository customerRepo, IOrderRepository orderRepo, @Qualifier("stripePaymentGateway") IPaymentGatewayAdapter paymentGatewayAdapter, IPaymentRepository paymentRepo, IProductInventoryRepository productInventoryRepo) {
-        this.customerRepo = customerRepo;
+    public PaymentService(IOrderRepository orderRepo, @Qualifier("stripePaymentGateway") IPaymentGatewayAdapter paymentGatewayAdapter, IPaymentRepository paymentRepo, IProductInventoryRepository productInventoryRepo) {
         this.orderRepo = orderRepo;
         this.paymentGatewayAdapter = paymentGatewayAdapter;
         this.paymentRepo = paymentRepo;
@@ -37,11 +34,11 @@ public class PaymentService implements IPaymentService {
 
     @Override
     public String getPaymentLink(Long customerId, Long orderId) {
-        Customer customer = this.customerRepo.findById(customerId)
-                .orElseThrow(() -> new UserNotFoundException(customerId));
+        Customer customer = new Customer();
+        customer.setId(customerId);
         Order order = this.orderRepo.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
-        if (!order.getCustomer().getId().equals(customerId))
+        if (!order.getCustomerId().equals(customerId))
             throw new IllegalStateException("The specified order id does not belong to the customer");
         if (order.getStatus() != OrderStatus.PENDING)
             throw new IllegalStateException("Cannot create payment link for the specified order");

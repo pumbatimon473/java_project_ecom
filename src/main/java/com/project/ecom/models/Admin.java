@@ -4,10 +4,11 @@ import com.project.ecom.enums.UserType;
 import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Entity
+@Getter
+@Setter
 public class Admin extends User {
     @Override
     public UserType getUserType() {

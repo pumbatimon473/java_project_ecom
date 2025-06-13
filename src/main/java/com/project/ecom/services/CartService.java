@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Service
 public class CartService implements ICartService {
-    private final ICustomerRepository customerRepo;
     private final IProductRepository productRepo;
     private final IProductInventoryRepository productInventoryRepo;
     private final ICustomerSessionRepository customerSessionRepo;
@@ -23,8 +22,7 @@ public class CartService implements ICartService {
     private final IOrderService orderService;
 
     @Autowired
-    public CartService(ICustomerRepository customerRepo, IProductRepository productRepo, IProductInventoryRepository productInventoryRepo, ICustomerSessionRepository customerSessionRepo, ICartRepository cartRepo, ICartItemRepository cartItemRepo, IAddressRepository addressRepo, IOrderService orderService) {
-        this.customerRepo = customerRepo;
+    public CartService(IProductRepository productRepo, IProductInventoryRepository productInventoryRepo, ICustomerSessionRepository customerSessionRepo, ICartRepository cartRepo, ICartItemRepository cartItemRepo, IAddressRepository addressRepo, IOrderService orderService) {
         this.productRepo = productRepo;
         this.productInventoryRepo = productInventoryRepo;
         this.customerSessionRepo = customerSessionRepo;
@@ -39,9 +37,6 @@ public class CartService implements ICartService {
         // check if the given product id is valid
         Product product = this.productRepo.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
-        // check if the customer is valid
-        Customer customer = this.customerRepo.findById(customerId)
-                .orElseThrow(() -> new UserNotFoundException(customerId));
         // check if the specified product is in the inventory
         ProductInventory productInventory = this.productInventoryRepo.findByProductId(productId)
                 .orElseThrow(() -> new ProductNotInInventoryException(productId));
@@ -55,7 +50,7 @@ public class CartService implements ICartService {
         Cart cart;
         if (customerSessionOptional.isEmpty()) {  // create a new active session
             customerSession = new CustomerSession();
-            customerSession.setCustomer(customer);
+            customerSession.setCustomerId(customerId);
             customerSession.setStatus(UserSessionStatus.ACTIVE);
             this.customerSessionRepo.save(customerSession);
             cart = new Cart();
@@ -106,14 +101,12 @@ public class CartService implements ICartService {
     }
 
     private CartItem getCartItem(Long customerId, Long cartItemId) {
-        this.customerRepo.findById(customerId)
-                .orElseThrow(() -> new UserNotFoundException(customerId));
         CartItem cartItem = this.cartItemRepo.findById(cartItemId)
                 .orElseThrow(() -> new CartItemNotFoundException(cartItemId));
         // check if the cart status is active and belongs to the same customer id
         if (cartItem.getCart().getStatus() != CartStatus.ACTIVE)
             throw new NoActiveCartLinkedException(cartItemId);
-        if (!cartItem.getCart().getSession().getCustomer().getId().equals(customerId))
+        if (!cartItem.getCart().getSession().getCustomerId().equals(customerId))
             throw new IllegalArgumentException("The given cart item is not associated with the customer");
         return cartItem;
     }
@@ -138,8 +131,6 @@ public class CartService implements ICartService {
 
     @Override
     public Cart getCart(Long customerId) {
-        this.customerRepo.findById(customerId)
-                .orElseThrow(() -> new UserNotFoundException(customerId));
         CustomerSession customerSession = this.customerSessionRepo.findByCustomerIdAndStatus(customerId, UserSessionStatus.ACTIVE)
                 .orElseThrow(() -> new NoActiveUserSessionException(customerId));
         return this.cartRepo.findBySessionIdAndStatus(customerSession.getId(), CartStatus.ACTIVE)
@@ -149,10 +140,9 @@ public class CartService implements ICartService {
     @Override
     public Order checkoutCart(Long customerId, Long deliveryAddressId) {
         Cart cart = this.getCart(customerId);
-        this.addressRepo.findById(deliveryAddressId)
+        Address deliveryAddress = this.addressRepo.findById(deliveryAddressId)
                 .orElseThrow(() -> new AddressNotFoundException(deliveryAddressId));
-        Long isDeliveryAddressLinked = this.customerRepo.isAddressAssociatedWithCustomer(deliveryAddressId, customerId);
-        if (isDeliveryAddressLinked != 1)
+        if (!deliveryAddress.getUserId().equals(customerId))
             throw new AddressNotLinkedException(deliveryAddressId, customerId);
         // forward the request to the OrderService
         List<Long> cartItemIds = cart.getCartItems().stream().map(BaseModel::getId).toList();

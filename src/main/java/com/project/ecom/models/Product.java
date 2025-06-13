@@ -39,7 +39,9 @@ public class Product extends BaseModel {
     @JsonIgnore  // ignores serialization of the orderItems collection
     private List<OrderItem> orderItems;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private Seller seller;
+//    @ManyToOne
+//    @JoinColumn(name = "seller_id")
+//    private Seller seller;
+
+    private Long sellerId;
 }

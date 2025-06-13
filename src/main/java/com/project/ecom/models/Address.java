@@ -5,13 +5,17 @@ import com.project.ecom.enums.Country;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @Entity
 public class Address extends BaseModel {
+    private Long userId;
+
     private String addressLine1;
     private String addressLine2;
     private String landmark;
