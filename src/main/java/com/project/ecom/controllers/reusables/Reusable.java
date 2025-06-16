@@ -61,13 +61,6 @@ public class Reusable {
         return productDto;
     }
 
-    public static OrderItemDto mapOrderItemToOrderItemDto(OrderItem orderItem) {
-        OrderItemDto orderItemDto = new OrderItemDto();
-        orderItemDto.setProduct(Reusable.mapProductToProductInCartDto(orderItem.getProduct()));
-        orderItemDto.setQuantity(orderItem.getQuantity());
-        return orderItemDto;
-    }
-
     public static PaymentDto mapPaymentToPaymentDto(Payment payment) {
         PaymentDto paymentDto = new PaymentDto();
         paymentDto.setOrderIds(payment.getOrders().stream().map(BaseModel::getId).toList());
@@ -75,5 +68,15 @@ public class Reusable {
         paymentDto.setStatus(payment.getStatus());
         paymentDto.setTransactionId(payment.getTransactionId());
         return paymentDto;
+    }
+
+    public static GetOrdersResponseDto mapPageToGetOrdersResponseDto(Page<Order> page) {
+        GetOrdersResponseDto responseDto = new GetOrdersResponseDto();
+        responseDto.setCurrentPage(page.getNumber());
+        responseDto.setPageSize(page.getSize());
+        responseDto.setTotalCount(page.getTotalElements());
+        responseDto.setTotalPages(page.getTotalPages());
+        responseDto.setOrders(page.getContent().stream().map(OrderDto::from).toList());  // Note: the list is immutable
+        return responseDto;
     }
 }

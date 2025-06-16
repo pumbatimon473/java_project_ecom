@@ -6,6 +6,8 @@ import com.project.ecom.exceptions.*;
 import com.project.ecom.models.*;
 import com.project.ecom.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -74,5 +76,25 @@ public class OrderService implements IOrderService {
         this.orderItemRepo.saveAll(orderItems);
         order.setOrderItems(orderItems);
         return order;
+    }
+
+    @Override
+    public List<Order> getActiveOrders(Long customerId) {
+        List<OrderStatus> excludedStatuses = List.of(OrderStatus.DELIVERED, OrderStatus.CANCELLED);
+        List<Order> activeOrders = this.orderRepo.getActiveOrders(customerId, excludedStatuses);
+        if (activeOrders.isEmpty())
+            throw new NoRecentOrdersException(customerId);
+        return activeOrders;
+    }
+
+    @Override
+    public Page<Order> getOrders(Long customerId, Pageable pageable) {
+        return this.orderRepo.findByCustomerId(customerId, pageable);
+    }
+
+    @Override
+    public Order getOrder(Long customerId, Long orderId) {
+        return this.orderRepo.findByIdAndCustomerId(orderId, customerId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 }

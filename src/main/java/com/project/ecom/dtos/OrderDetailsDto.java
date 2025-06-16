@@ -28,7 +28,7 @@ public class OrderDetailsDto {
         orderDetailsDto.setDeliveryAddress(order.getDeliveryAddress());
         orderDetailsDto.setOrderTotal(order.getOrderTotal());
 
-        List<OrderItemDto> orderItems = order.getOrderItems().stream().map(Reusable::mapOrderItemToOrderItemDto).toList();
+        List<OrderItemDto> orderItems = order.getOrderItems().stream().map(OrderItemDto::from).toList();
         orderDetailsDto.setOrderItems(orderItems);
         return orderDetailsDto;
     }
