@@ -9,6 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Deprecated
 public class Admin extends User {
     @Override
     public UserType getUserType() {

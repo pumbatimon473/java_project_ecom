@@ -126,6 +126,11 @@
 			<artifactId>spring-security-oauth2-jose</artifactId>
 			<version>6.5.0</version>
 		</dependency>
+		<!-- Enabling Jakarta Bean Validation: allows validating fields and method arguments -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

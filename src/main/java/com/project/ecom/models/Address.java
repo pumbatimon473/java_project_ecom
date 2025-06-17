@@ -1,6 +1,7 @@
 package com.project.ecom.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.project.ecom.enums.AddressType;
 import com.project.ecom.enums.Country;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -14,7 +15,8 @@ import java.util.List;
 @Setter
 @Entity
 public class Address extends BaseModel {
-    private Long userId;
+    @Column(nullable = false)
+    private Long userId;  // could refer either customerId or sellerId
 
     private String addressLine1;
     private String addressLine2;
@@ -29,4 +31,7 @@ public class Address extends BaseModel {
 
     @Enumerated(EnumType.STRING)
     private Country country;
+
+    @Enumerated(EnumType.STRING)
+    private AddressType addressType;
 }

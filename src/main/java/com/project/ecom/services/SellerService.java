@@ -1,5 +1,8 @@
 package com.project.ecom.services;
 
+import com.project.ecom.clients.AuthClient;
+import com.project.ecom.dtos.SellerProfileResponseDto;
+import com.project.ecom.dtos.clients.auth_client.UserInfoDto;
 import com.project.ecom.enums.UserType;
 import com.project.ecom.exceptions.ProductCategoryNotFoundException;
 import com.project.ecom.exceptions.ProductNotFoundException;
@@ -16,18 +19,24 @@ import java.util.Optional;
 
 @Service
 public class SellerService implements ISellerService {
-    private IProductRepository productRepo;
-    private IProductInventoryRepository productInventoryRepo;
-    private IProductCategoryRepository productCategoryRepo;
-    private IProductImageRepository productImageRepo;
+    private final IProductRepository productRepo;
+    private final IProductInventoryRepository productInventoryRepo;
+    private final IProductCategoryRepository productCategoryRepo;
+    private final IProductImageRepository productImageRepo;
+    private final ISellerProfileRepository sellerProfileRepo;
+    private final AuthClient authClient;
+    private final IAddressRepository addressRepo;
 
     @Autowired
     public SellerService(IProductRepository productRepo, IProductInventoryRepository productInventoryRepo,
-                         IProductCategoryRepository productCategoryRepo, IProductImageRepository productImageRepo) {
+                         IProductCategoryRepository productCategoryRepo, IProductImageRepository productImageRepo, ISellerProfileRepository sellerProfileRepo, AuthClient authClient, IAddressRepository addressRepo) {
         this.productRepo = productRepo;
         this.productInventoryRepo = productInventoryRepo;
         this.productCategoryRepo = productCategoryRepo;
         this.productImageRepo = productImageRepo;
+        this.sellerProfileRepo = sellerProfileRepo;
+        this.authClient = authClient;
+        this.addressRepo = addressRepo;
     }
 
     @Override
@@ -78,5 +87,14 @@ public class SellerService implements ISellerService {
         product.setInventory(productInventory);
         this.productRepo.save(product);
         return productInventory;
+    }
+
+    @Override
+    public SellerProfileResponseDto getProfile(Long sellerId) {
+        SellerProfile sellerProfile = this.sellerProfileRepo.findBySellerId(sellerId)
+                .orElse(null);
+        List<Address> addresses = this.addressRepo.findByUserId(sellerId);
+        UserInfoDto userInfo = this.authClient.getUserInfo(sellerId);
+        return SellerProfileResponseDto.from(userInfo, sellerProfile, addresses);
     }
 }

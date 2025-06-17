@@ -8,6 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Deprecated
 public abstract class User {
     private Long id;
     private String name;

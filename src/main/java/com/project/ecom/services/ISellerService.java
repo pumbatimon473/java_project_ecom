@@ -1,5 +1,6 @@
 package com.project.ecom.services;
 
+import com.project.ecom.dtos.SellerProfileResponseDto;
 import com.project.ecom.exceptions.ProductNotFoundException;
 import com.project.ecom.exceptions.UnauthorizedUserException;
 import com.project.ecom.exceptions.UserNotFoundException;
@@ -15,4 +16,6 @@ public interface ISellerService {
 
     ProductInventory updateProductInventory(Long sellerId, Long productId, Integer quantity)
             throws UserNotFoundException, UnauthorizedUserException, ProductNotFoundException;
+
+    SellerProfileResponseDto getProfile(Long sellerId);
 }

@@ -72,4 +72,11 @@ public class SellerController {
         responseDto.setQuantity(productInventory.getQuantity());
         return ResponseEntity.ok(responseDto);
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<SellerProfileResponseDto> getProfile(@AuthenticationPrincipal Jwt jwt) {
+        Long sellerId = jwt.getClaim("user_id");
+        SellerProfileResponseDto sellerProfile = this.sellerService.getProfile(sellerId);
+        return ResponseEntity.ok(sellerProfile);
+    }
 }

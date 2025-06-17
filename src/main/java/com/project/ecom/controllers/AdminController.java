@@ -1,21 +1,17 @@
 package com.project.ecom.controllers;
 
-import com.project.ecom.dtos.CreateProductCategoryRequestDto;
-import com.project.ecom.dtos.CreateProductCategoryResponseDto;
-import com.project.ecom.dtos.RegisterSellerRequestDto;
-import com.project.ecom.dtos.RegisterSellerResponseDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.project.ecom.dtos.*;
 import com.project.ecom.models.ProductCategory;
 import com.project.ecom.models.Seller;
+import com.project.ecom.models.SellerRegistrationApplication;
 import com.project.ecom.services.IAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -28,7 +24,7 @@ public class AdminController {
     }
 
     @PostMapping("/product_category")
-    ResponseEntity<CreateProductCategoryResponseDto> createProductCategory(@RequestBody CreateProductCategoryRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<CreateProductCategoryResponseDto> createProductCategory(@RequestBody CreateProductCategoryRequestDto requestDto, @AuthenticationPrincipal Jwt jwt) {
         Long adminId = jwt.getClaim("user_id");
         ProductCategory productCategory = this.adminService.addProductCategory(adminId, requestDto.getProductCategoryName(), requestDto.getDescription());
         CreateProductCategoryResponseDto responseDto = new CreateProductCategoryResponseDto();
@@ -38,4 +34,10 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
+    @PatchMapping("/request/seller")
+    public ResponseEntity<UpdateSellerRegAppResponseDto> updateSellerRegApplication(@RequestBody UpdateSellerRegistrationApplicationDto requestDto, @AuthenticationPrincipal Jwt jwt) throws JsonProcessingException, IllegalAccessException {
+        Long adminId = jwt.getClaim("user_id");
+        SellerRegistrationApplication sellerRegApplication = this.adminService.updateSellerRegApplication(adminId, requestDto.getApplicationId(), requestDto.getStatus());
+        return ResponseEntity.ok(UpdateSellerRegAppResponseDto.from(sellerRegApplication));
+    }
 }

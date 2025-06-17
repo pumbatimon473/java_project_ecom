@@ -12,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Deprecated
 public class Seller extends User {
     private String panNumber;
     private String gstRegNumber;

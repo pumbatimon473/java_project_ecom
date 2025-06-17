@@ -8,6 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Deprecated
 public class Customer extends User {
     private List<CustomerSession> sessions;
 
