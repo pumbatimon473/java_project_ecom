@@ -6,6 +6,7 @@ import com.project.ecom.dtos.AddAddressRequestDto;
 import com.project.ecom.enums.AddressType;
 import com.project.ecom.enums.ApprovalStatus;
 import com.project.ecom.enums.ReviewStatus;
+import com.project.ecom.exceptions.DuplicateProductCategoryException;
 import com.project.ecom.exceptions.SellerRegApplicationNotFoundException;
 import com.project.ecom.models.*;
 import com.project.ecom.repositories.IAddressRepository;
@@ -36,9 +37,13 @@ public class AdminService implements IAdminService {
 
     @Override
     public ProductCategory addProductCategory(Long adminId, String name, String description) {
+        Optional<ProductCategory> productCategoryOptional = this.productCategoryRepo.findByNameIgnoreCase(name.trim());
+        productCategoryOptional.ifPresent(productCategory -> {
+            throw new DuplicateProductCategoryException(name);
+        });
         // create new product category
         ProductCategory productCategory = new ProductCategory();
-        productCategory.setName(name);
+        productCategory.setName(name.trim());
         productCategory.setDescription(description);
         return this.productCategoryRepo.save(productCategory);
     }

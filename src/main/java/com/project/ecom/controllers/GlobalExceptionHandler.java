@@ -141,4 +141,12 @@ public class GlobalExceptionHandler {
         });
         return ResponseEntity.badRequest().body(errors);
     }
+
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<String> handleExternalServiceException(ExternalServiceException e) {
+        System.out.println(":: DEBUG LOG :: ExternalServiceException Handler Called ...");
+        return ResponseEntity
+                .status(e.getStatusCode())
+                .body(e.getErrorBody());
+    }
 }

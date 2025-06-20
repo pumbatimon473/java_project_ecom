@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -18,7 +20,10 @@ public class SpringSecurityConfig {
     @Order(1)
     public SecurityFilterChain publicEndpoints(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/product/**")
+                .securityMatcher(new OrRequestMatcher(
+                        new AntPathRequestMatcher("/api/product/**"),
+                        new AntPathRequestMatcher("/api/search/products/**")
+                ))
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()
                 );

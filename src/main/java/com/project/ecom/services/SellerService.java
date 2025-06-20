@@ -3,7 +3,9 @@ package com.project.ecom.services;
 import com.project.ecom.clients.AuthClient;
 import com.project.ecom.dtos.SellerProfileResponseDto;
 import com.project.ecom.dtos.clients.auth_client.UserInfoDto;
-import com.project.ecom.enums.UserType;
+import com.project.ecom.es.model_mapper.ProductMapper;
+import com.project.ecom.es.mapper.ESProduct;
+import com.project.ecom.es.repository.ESProductRepository;
 import com.project.ecom.exceptions.ProductCategoryNotFoundException;
 import com.project.ecom.exceptions.ProductNotFoundException;
 import com.project.ecom.exceptions.UnauthorizedUserException;
@@ -26,10 +28,11 @@ public class SellerService implements ISellerService {
     private final ISellerProfileRepository sellerProfileRepo;
     private final AuthClient authClient;
     private final IAddressRepository addressRepo;
+    private final ESProductRepository esProductRepo;
 
     @Autowired
     public SellerService(IProductRepository productRepo, IProductInventoryRepository productInventoryRepo,
-                         IProductCategoryRepository productCategoryRepo, IProductImageRepository productImageRepo, ISellerProfileRepository sellerProfileRepo, AuthClient authClient, IAddressRepository addressRepo) {
+                         IProductCategoryRepository productCategoryRepo, IProductImageRepository productImageRepo, ISellerProfileRepository sellerProfileRepo, AuthClient authClient, IAddressRepository addressRepo, ESProductRepository esProductRepo) {
         this.productRepo = productRepo;
         this.productInventoryRepo = productInventoryRepo;
         this.productCategoryRepo = productCategoryRepo;
@@ -37,6 +40,7 @@ public class SellerService implements ISellerService {
         this.sellerProfileRepo = sellerProfileRepo;
         this.authClient = authClient;
         this.addressRepo = addressRepo;
+        this.esProductRepo = esProductRepo;
     }
 
     @Override
@@ -61,6 +65,10 @@ public class SellerService implements ISellerService {
             product.setImage(productImage);
             this.productRepo.save(product);
         }
+        // step 2: persist in ES repository
+        ESProduct esProduct = ProductMapper.mapToESProduct(product);
+        esProductRepo.save(esProduct);
+
         return product;
     }
 

@@ -18,7 +18,7 @@ public class Product extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private ProductCategory category;
-
+    @Lob  // To avoid 255 char limit; CLOB (Character Large Object): automatically mapped by Hibernate to text
     private String description;
     private BigDecimal price;
 
