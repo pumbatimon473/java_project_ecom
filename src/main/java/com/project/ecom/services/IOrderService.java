@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IOrderService {
+    @Deprecated
     Order createOrder(Long customerId, List<Long> cartItemIds, Long deliveryAddressId);  // places order from the cart
 
     List<Order> getActiveOrders(Long customerId);  // returns the list of recent orders (not delivered yet)

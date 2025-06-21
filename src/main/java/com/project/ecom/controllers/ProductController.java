@@ -1,6 +1,7 @@
 package com.project.ecom.controllers;
 
 import com.project.ecom.controllers.reusables.Reusable;
+import com.project.ecom.dtos.BasicProductDetailsDto;
 import com.project.ecom.dtos.GetProductsResponseDto;
 import com.project.ecom.dtos.ProductDetailsDto;
 import com.project.ecom.models.Product;
@@ -44,5 +45,11 @@ public class ProductController {
     public ResponseEntity<GetProductsResponseDto> searchProductsByName(@RequestParam(name = "productName") String name, @RequestParam(defaultValue = "0") Integer pageNumber, @RequestParam(defaultValue = "10") Integer pageSize) {
         Page<Product> page = this.productService.searchProductsByName(name, pageNumber, pageSize);
         return ResponseEntity.ok(Reusable.mapPageToGetProductsResponseDto(page));
+    }
+
+    @GetMapping("/basic-info/{id}")
+    public ResponseEntity<BasicProductDetailsDto> getBasicProductInfo(@PathVariable(name = "id") Long productId) {
+        Product product = this.productService.getProductById(productId);
+        return ResponseEntity.ok(BasicProductDetailsDto.from(product));
     }
 }

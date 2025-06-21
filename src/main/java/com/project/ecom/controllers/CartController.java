@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Deprecated
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/old/api/cart")
 public class CartController {
     private final ICartService cartService;
 
