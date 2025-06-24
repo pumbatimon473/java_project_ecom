@@ -1,10 +1,10 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.ecom.enums.OrderStatus;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,12 +30,13 @@ public class Order extends BaseModel {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "payment_id")
+    @OneToOne(mappedBy = "order")
+    @JsonBackReference
     private Payment payment;
 
-    @OneToOne(mappedBy = "order")
-    private Invoice invoice;
+    @OneToMany(mappedBy = "order")
+    @JsonIgnore
+    private List<Invoice> invoices;
 
     @ManyToOne
     @JoinColumn(name = "delivery_address_id")

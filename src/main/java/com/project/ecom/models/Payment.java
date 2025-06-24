@@ -1,19 +1,25 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.ecom.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @Entity
 public class Payment extends BaseModel {
-    @OneToMany(mappedBy = "payment")
-    private List<Order> orders;
+    @OneToOne
+    @JoinColumn(name = "order_id")
+    @JsonManagedReference
+    private Order order;
 
     private BigDecimal amount;
 
@@ -23,6 +29,7 @@ public class Payment extends BaseModel {
     private String transactionId;
 
     @OneToMany(mappedBy = "payment")
+    @JsonBackReference
     private List<Invoice> invoices;
 
     private String sessionId;  // represents the checkout session id or the payment link id

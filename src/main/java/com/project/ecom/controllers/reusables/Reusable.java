@@ -63,7 +63,7 @@ public class Reusable {
 
     public static PaymentDto mapPaymentToPaymentDto(Payment payment) {
         PaymentDto paymentDto = new PaymentDto();
-        paymentDto.setOrderIds(payment.getOrders().stream().map(BaseModel::getId).toList());
+        paymentDto.setOrderId(payment.getOrder().getId());
         paymentDto.setAmount(payment.getAmount());
         paymentDto.setStatus(payment.getStatus());
         paymentDto.setTransactionId(payment.getTransactionId());

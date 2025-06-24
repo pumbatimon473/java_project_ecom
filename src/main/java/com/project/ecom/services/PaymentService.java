@@ -4,6 +4,8 @@ import com.project.ecom.adapters.payment.IPaymentGatewayAdapter;
 import com.project.ecom.enums.OrderStatus;
 import com.project.ecom.enums.PaymentStatus;
 import com.project.ecom.exceptions.*;
+import com.project.ecom.kafka.events.OrderPlacedEvent;
+import com.project.ecom.kafka.producers.OrderPlacedEventProducer;
 import com.project.ecom.models.*;
 import com.project.ecom.repositories.IOrderRepository;
 import com.project.ecom.repositories.IPaymentRepository;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,13 +26,15 @@ public class PaymentService implements IPaymentService {
     private final IPaymentGatewayAdapter paymentGatewayAdapter;
     private final IPaymentRepository paymentRepo;
     private final IProductInventoryRepository productInventoryRepo;
+    private final OrderPlacedEventProducer orderPlacedEventProducer;
 
     @Autowired
-    public PaymentService(IOrderRepository orderRepo, @Qualifier("stripePaymentGateway") IPaymentGatewayAdapter paymentGatewayAdapter, IPaymentRepository paymentRepo, IProductInventoryRepository productInventoryRepo) {
+    public PaymentService(IOrderRepository orderRepo, @Qualifier("stripePaymentGateway") IPaymentGatewayAdapter paymentGatewayAdapter, IPaymentRepository paymentRepo, IProductInventoryRepository productInventoryRepo, OrderPlacedEventProducer orderPlacedEventProducer) {
         this.orderRepo = orderRepo;
         this.paymentGatewayAdapter = paymentGatewayAdapter;
         this.paymentRepo = paymentRepo;
         this.productInventoryRepo = productInventoryRepo;
+        this.orderPlacedEventProducer = orderPlacedEventProducer;
     }
 
     @Override
@@ -86,7 +91,21 @@ public class PaymentService implements IPaymentService {
         order.setPayment(payment);
         this.orderRepo.save(order);
 
-        payment.setOrders(List.of(order));
+        payment.setOrder(order);
+
+        this.publishOrderPlacedEvent(payment, order);  // publish OrderPlacedEvent
         return payment;
+    }
+
+    private void publishOrderPlacedEvent(Payment payment, Order order) {
+        OrderPlacedEvent event = new OrderPlacedEvent();
+        event.setOrderId(order.getId());
+        event.setCustomerId(order.getCustomerId());
+        event.setTotal(payment.getAmount());
+        event.setStatus(order.getStatus());
+        event.setCreatedAt(LocalDateTime.now());
+        event.setTransactionId(payment.getTransactionId());
+
+        this.orderPlacedEventProducer.publish(event);
     }
 }

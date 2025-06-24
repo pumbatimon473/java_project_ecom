@@ -18,4 +18,6 @@ public interface IOrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByCustomerId(Long customerId, Pageable pageable);
 
     Optional<Order> findByIdAndCustomerId(Long orderId, Long customerId);
+
+    Optional<Order> findByIdAndStatus(Long orderId, OrderStatus orderStatus);
 }

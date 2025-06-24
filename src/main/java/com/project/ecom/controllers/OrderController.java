@@ -1,10 +1,10 @@
 package com.project.ecom.controllers;
 
 import com.project.ecom.controllers.reusables.Reusable;
-import com.project.ecom.dtos.GetOrdersResponseDto;
-import com.project.ecom.dtos.OrderDetailsDto;
-import com.project.ecom.dtos.OrderDto;
+import com.project.ecom.dtos.*;
+import com.project.ecom.models.Invoice;
 import com.project.ecom.models.Order;
+import com.project.ecom.services.IInvoiceService;
 import com.project.ecom.services.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,11 +27,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
-    private IOrderService orderService;
+    private final IOrderService orderService;
+    private final IInvoiceService invoiceService;
 
     @Autowired
-    public OrderController(IOrderService orderService) {
+    public OrderController(IOrderService orderService, IInvoiceService invoiceService) {
         this.orderService = orderService;
+        this.invoiceService = invoiceService;
     }
 
     @GetMapping
@@ -64,4 +66,10 @@ public class OrderController {
         return ResponseEntity.ok(OrderDetailsDto.from(order));
     }
 
+    @GetMapping("/{orderId}/invoices")
+    public ResponseEntity<InvoicesResponseDto> getInvoices(@PathVariable(name = "orderId") Long orderId, @AuthenticationPrincipal Jwt jwt) {
+        Long customerId = jwt.getClaim("user_id");
+        InvoiceDetails invoiceDetails = this.invoiceService.getInvoices(customerId, orderId);
+        return ResponseEntity.ok(InvoicesResponseDto.from(invoiceDetails));
+    }
 }

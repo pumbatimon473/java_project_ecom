@@ -4,6 +4,8 @@ import com.project.ecom.clients.AuthClient;
 import com.project.ecom.dtos.CartItemDetails;
 import com.project.ecom.enums.OrderStatus;
 import com.project.ecom.exceptions.*;
+import com.project.ecom.kafka.events.OrderCreatedEvent;
+import com.project.ecom.kafka.producers.OrderCreatedEventProducer;
 import com.project.ecom.models.*;
 import com.project.ecom.repositories.*;
 import jakarta.transaction.Transactional;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +25,17 @@ public class CartCheckoutService implements ICartCheckoutService {
     private final IAddressRepository addressRepo;
     private final IOrderRepository orderRepo;
     private final IOrderItemRepository orderItemRepo;
+    private final OrderCreatedEventProducer orderCreatedEventProducer;
 
     @Autowired
-    public CartCheckoutService(AuthClient authClient, IProductRepository productRepo, IProductInventoryRepository productInventoryRepo, IAddressRepository addressRepo, IOrderRepository orderRepo, IOrderItemRepository orderItemRepo) {
+    public CartCheckoutService(AuthClient authClient, IProductRepository productRepo, IProductInventoryRepository productInventoryRepo, IAddressRepository addressRepo, IOrderRepository orderRepo, IOrderItemRepository orderItemRepo, OrderCreatedEventProducer orderCreatedEventProducer) {
         this.authClient = authClient;
         this.productRepo = productRepo;
         this.productInventoryRepo = productInventoryRepo;
         this.addressRepo = addressRepo;
         this.orderRepo = orderRepo;
         this.orderItemRepo = orderItemRepo;
+        this.orderCreatedEventProducer = orderCreatedEventProducer;
     }
 
     @Override
@@ -51,7 +56,22 @@ public class CartCheckoutService implements ICartCheckoutService {
         orderItems.forEach(orderItem -> orderItem.setOrder(order));
         this.orderItemRepo.saveAll(orderItems);
         order.setOrderItems(orderItems);
+
+        publishOrderCreatedEvent(order);  // publishes OrderCreatedEvent to Kafka topic 'order-created-events'
+
         return order;
+    }
+
+    private void publishOrderCreatedEvent(Order order) {
+        OrderCreatedEvent event = new OrderCreatedEvent();
+        event.setOrderId(order.getId());
+        event.setCustomerId(order.getCustomerId());
+        event.setProducts(order.getOrderItems().stream().map(item -> item.getProduct().getId()).toList());
+        event.setTotal(order.getOrderTotal().getOrderTotal());
+        event.setCreatedAt(LocalDateTime.now());
+        event.setStatus(order.getStatus());
+
+        this.orderCreatedEventProducer.publish(event);
     }
 
     private Address verifyDeliveryAddress(Long customerId, Long deliveryAddressId) {

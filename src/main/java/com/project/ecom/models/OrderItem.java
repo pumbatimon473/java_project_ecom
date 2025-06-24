@@ -1,5 +1,6 @@
 package com.project.ecom.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -24,5 +25,6 @@ public class OrderItem extends BaseModel {
 
     @ManyToOne
     @JoinColumn(name = "invoice_id")
+    @JsonManagedReference
     private Invoice invoice;
 }

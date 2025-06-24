@@ -22,7 +22,8 @@ public class SpringSecurityConfig {
         http
                 .securityMatcher(new OrRequestMatcher(
                         new AntPathRequestMatcher("/api/product/**"),
-                        new AntPathRequestMatcher("/api/search/products/**")
+                        new AntPathRequestMatcher("/api/search/products/**"),
+                        new AntPathRequestMatcher("/api/payment/confirmation/**")  // to allow payment webhooks to work
                 ))
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()
