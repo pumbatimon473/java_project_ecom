@@ -5,11 +5,14 @@ import com.project.ecom.exceptions.ExternalServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.Duration;
 
 @Component
 public class AuthClient {
@@ -19,9 +22,13 @@ public class AuthClient {
 
     @Autowired
     public AuthClient(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder.build();
+        this.restTemplate = restTemplateBuilder
+                .connectTimeout(Duration.ofSeconds(3L))
+                .readTimeout(Duration.ofSeconds(5L))
+                .build();
     }
 
+    @Cacheable(value = "userinfo", key = "#userId", unless = "#result == null")
     public UserInfoDto getUserInfo(Long userId) {
         String url = new StringBuilder(this.authServiceHost)
                 .append("/api/users/basic-info/{id}")

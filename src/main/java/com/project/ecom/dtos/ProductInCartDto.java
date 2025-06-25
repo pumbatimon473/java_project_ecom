@@ -3,11 +3,13 @@ package com.project.ecom.dtos;
 import com.project.ecom.models.Product;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
+@ToString
 public class ProductInCartDto {
     private Long productId;
     private String name;

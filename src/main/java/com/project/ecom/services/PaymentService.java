@@ -1,6 +1,9 @@
 package com.project.ecom.services;
 
 import com.project.ecom.adapters.payment.IPaymentGatewayAdapter;
+import com.project.ecom.clients.AuthClient;
+import com.project.ecom.dtos.OrderItemDto;
+import com.project.ecom.dtos.clients.auth_client.UserInfoDto;
 import com.project.ecom.enums.OrderStatus;
 import com.project.ecom.enums.PaymentStatus;
 import com.project.ecom.exceptions.*;
@@ -27,14 +30,16 @@ public class PaymentService implements IPaymentService {
     private final IPaymentRepository paymentRepo;
     private final IProductInventoryRepository productInventoryRepo;
     private final OrderPlacedEventProducer orderPlacedEventProducer;
+    private final AuthClient authClient;
 
     @Autowired
-    public PaymentService(IOrderRepository orderRepo, @Qualifier("stripePaymentGateway") IPaymentGatewayAdapter paymentGatewayAdapter, IPaymentRepository paymentRepo, IProductInventoryRepository productInventoryRepo, OrderPlacedEventProducer orderPlacedEventProducer) {
+    public PaymentService(IOrderRepository orderRepo, @Qualifier("stripePaymentGateway") IPaymentGatewayAdapter paymentGatewayAdapter, IPaymentRepository paymentRepo, IProductInventoryRepository productInventoryRepo, OrderPlacedEventProducer orderPlacedEventProducer, AuthClient authClient) {
         this.orderRepo = orderRepo;
         this.paymentGatewayAdapter = paymentGatewayAdapter;
         this.paymentRepo = paymentRepo;
         this.productInventoryRepo = productInventoryRepo;
         this.orderPlacedEventProducer = orderPlacedEventProducer;
+        this.authClient = authClient;
     }
 
     @Override
@@ -98,14 +103,17 @@ public class PaymentService implements IPaymentService {
     }
 
     private void publishOrderPlacedEvent(Payment payment, Order order) {
+        UserInfoDto customerInfo = this.authClient.getUserInfo(order.getCustomerId());
+
         OrderPlacedEvent event = new OrderPlacedEvent();
         event.setOrderId(order.getId());
-        event.setCustomerId(order.getCustomerId());
+        event.setCustomerInfo(customerInfo);
         event.setTotal(payment.getAmount());
         event.setStatus(order.getStatus());
         event.setCreatedAt(LocalDateTime.now());
         event.setTransactionId(payment.getTransactionId());
-
+        event.setOrderItems(order.getOrderItems().stream().map(OrderItemDto::from).toList());
+        System.out.println(":: DEBUG PUBLISH :: orderItems : " + event.getOrderItems());
         this.orderPlacedEventProducer.publish(event);
     }
 }

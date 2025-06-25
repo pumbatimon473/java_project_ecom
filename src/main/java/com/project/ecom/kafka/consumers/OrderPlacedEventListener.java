@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class OrderPlacedEventListener {
         this.invoiceService = invoiceService;
     }
 
+    @Async  // As the invoice generation is happening synchronously (Blocking Call)
     @KafkaListener(topics = "${kafka.topic.order-placed}", groupId = "${spring.kafka.consumer.group-id}")
     public void handleOrderPlacedEvent(OrderPlacedEvent event) {
         logger.info(":: PAYMENT CONFIRMED for the order ::\n{}", event);
