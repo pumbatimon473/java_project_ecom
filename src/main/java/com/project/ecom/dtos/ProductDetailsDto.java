@@ -15,5 +15,6 @@ public class ProductDetailsDto {
     private String description;
     private BigDecimal price;
     private ProductImage image;
-    private SellerDto soldBy;
+    //private SellerDto soldBy;
+    private Long sellerId;
 }

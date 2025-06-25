@@ -15,5 +15,6 @@ public class ProductDto {
     private String description;
     private BigDecimal price;
     private String primaryImage;  // represents the first image of the product in the list
-    private String soldBy;
+    //private String soldBy;
+    private Long sellerId;
 }

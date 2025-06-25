@@ -57,6 +57,7 @@ public class SellerController {
 
 //        SellerDto sellerDto = Reusable.mapSellerToSellerDto(product.getSeller());
 //        responseDto.setSeller(sellerDto);
+        responseDto.setSellerId(product.getSellerId());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 

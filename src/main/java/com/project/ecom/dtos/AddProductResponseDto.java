@@ -16,5 +16,6 @@ public class AddProductResponseDto {
     private String description;
     private BigDecimal price;
     private ProductImage image;
-    private SellerDto seller;
+    //private SellerDto seller;
+    private Long sellerId;
 }

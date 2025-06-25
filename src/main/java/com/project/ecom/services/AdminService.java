@@ -64,7 +64,7 @@ public class AdminService implements IAdminService {
                 sellerProfile.setSellerId(sellerRegApp.getUserId());
                 sellerProfile.setBusinessName(sellerRegApp.getBusinessName());
                 sellerProfile.setPanNumber(sellerRegApp.getPanNumber());
-                sellerRegApp.setGstRegNumber(sellerRegApp.getGstRegNumber());
+                sellerProfile.setGstRegNumber(sellerRegApp.getGstRegNumber());
                 sellerProfile.setBusinessContact(sellerRegApp.getBusinessContact());
                 this.sellerProfileRepo.save(sellerProfile);
             }

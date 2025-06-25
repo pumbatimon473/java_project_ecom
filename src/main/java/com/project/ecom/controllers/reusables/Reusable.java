@@ -26,6 +26,7 @@ public class Reusable {
         productDto.setDescription(product.getDescription());
         productDto.setPrice(product.getPrice());
         productDto.setPrimaryImage(product.getImage().getImageUrls().stream().findFirst().orElse(null));
+        productDto.setSellerId(product.getSellerId());
 //        productDto.setSoldBy(product.getSeller().getName());
         return productDto;
     }
@@ -47,9 +48,10 @@ public class Reusable {
         productDto.setDescription(product.getDescription());
         productDto.setPrice(product.getPrice());
         productDto.setImage(product.getImage());
-
+        productDto.setSellerId(product.getSellerId());
 //        SellerDto sellerDto = Reusable.mapSellerToSellerDto(product.getSeller());
 //        productDto.setSoldBy(sellerDto);
+
         return productDto;
     }
 
