@@ -1,5 +1,6 @@
 package com.project.ecom.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -16,6 +17,9 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
+    @Value("${ecom.auth-service.url}")
+    private String AUTH_SERVICE_HOST;
+
     @Bean
     @Order(1)
     public SecurityFilterChain publicEndpoints(HttpSecurity http) throws Exception {
@@ -49,7 +53,7 @@ public class SpringSecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder
-                .withJwkSetUri("http://localhost:8090/oauth2/jwks")
+                .withJwkSetUri(AUTH_SERVICE_HOST + "/oauth2/jwks")
                 .build();
     }
 
